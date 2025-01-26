@@ -45,28 +45,3 @@ class Quarto {
         return manutencoes;
     }
 }
-
-// Classe Manutencao
-class Manutencao {
-    private int id;
-    private String descricao;
-    private Quarto quarto;
-
-    public Manutencao(int id, String descricao, Quarto quarto) {
-        this.id = id;
-        this.descricao = descricao;
-        this.quarto = quarto;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public Quarto getQuarto() {
-        return quarto;
-    }
-} 
