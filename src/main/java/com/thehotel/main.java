@@ -43,7 +43,7 @@ public class Main {
         scanner.close();
     }
 
-    private static void menuGestor(Scanner scanner, Gestor gestor, List<Quarto> quartos, List<Manutencao> manutencoes) {
+    public static void menuGestor(Scanner scanner, Gestor gestor, List<Quarto> quartos, List<Manutencao> manutencoes) {
         while (true) {
             try {
                 System.out.println("\n--- Ações do Gestor ---");
@@ -77,7 +77,7 @@ public class Main {
         }
     }
 
-    private static void menuFuncionario(Scanner scanner, Funcionario funcionario, List<Quarto> quartos, List<Reserva> reservas, List<Manutencao> manutencoes) {
+    public static void menuFuncionario(Scanner scanner, Funcionario funcionario, List<Quarto> quartos, List<Reserva> reservas, List<Manutencao> manutencoes) {
         while (true) {
             try {
                 System.out.println("\n--- Ações do Funcionário ---");
@@ -107,7 +107,7 @@ public class Main {
         }
     }
 
-    private static void criarQuarto(Scanner scanner, List<Quarto> quartos) {
+    public static void criarQuarto(Scanner scanner, List<Quarto> quartos) {
         System.out.print("Número do quarto: ");
         int numero = scanner.nextInt();
         System.out.print("Capacidade máxima do quarto: ");
@@ -117,7 +117,7 @@ public class Main {
         System.out.println("Quarto criado com sucesso!");
     }
 
-    private static void editarQuarto(Scanner scanner, List<Quarto> quartos) {
+    public static void editarQuarto(Scanner scanner, List<Quarto> quartos) {
         System.out.print("Número do quarto a editar: ");
         int numero = scanner.nextInt();
         Quarto quarto = buscarQuarto(quartos, numero);
@@ -131,7 +131,7 @@ public class Main {
         }
     }
 
-    private static void removerQuarto(Scanner scanner, List<Quarto> quartos) {
+    public static void removerQuarto(Scanner scanner, List<Quarto> quartos) {
         System.out.print("Número do quarto a remover: ");
         int numero = scanner.nextInt();
         Quarto quarto = buscarQuarto(quartos, numero);
@@ -143,12 +143,12 @@ public class Main {
         }
     }
 
-    private static void listarQuartos(List<Quarto> quartos) {
+    public static void listarQuartos(List<Quarto> quartos) {
         System.out.println("\n--- Lista de Quartos ---");
         quartos.forEach(q -> System.out.println("ID: " + q.getNumero() + ", Capacidade: " + q.getCapacidadeMaxima()));
     }
 
-    private static void registrarQuartoOcupado(Scanner scanner, List<Quarto> quartos) {
+    public static void registrarQuartoOcupado(Scanner scanner, List<Quarto> quartos) {
         System.out.print("ID do quarto a registrar como ocupado: ");
         int numero = scanner.nextInt();
         Quarto quarto = buscarQuarto(quartos, numero);
@@ -160,7 +160,7 @@ public class Main {
         }
     }
 
-    private static void registrarManutencao(Scanner scanner, List<Quarto> quartos, List<Manutencao> manutencoes) {
+    public static void registrarManutencao(Scanner scanner, List<Quarto> quartos, List<Manutencao> manutencoes) {
         System.out.print("ID do quarto: ");
         int numero = scanner.nextInt();
         Quarto quarto = buscarQuarto(quartos, numero);
@@ -178,45 +178,48 @@ public class Main {
         }
     }
 
-    private static void fazerReserva(Scanner scanner, List<Reserva> reservas, List<Quarto> quartos) {
+    public static void fazerReserva(Scanner scanner, List<Reserva> reservas, List<Quarto> quartos) {
         System.out.print("Nome do hóspede: ");
-        scanner.nextLine(); // Limpar o buffer
         String nomeHospede = scanner.nextLine();
         System.out.print("Data de entrada (YYYY-MM-DD): ");
         String dataEntrada = scanner.nextLine();
         System.out.print("Data de saída (YYYY-MM-DD): ");
         String dataSaida = scanner.nextLine();
         System.out.print("Número de pessoas: ");
-        int numeroPessoas = scanner.nextInt();
-
-        System.out.println("\n--- Quartos Disponíveis ---");
+        int numeroPessoas = Integer.parseInt(scanner.nextLine());
+    
+        // Filtrar quartos disponíveis
         List<Quarto> disponiveis = quartos.stream()
                 .filter(q -> !q.isOcupado() && q.getCapacidadeMaxima() >= numeroPessoas)
                 .toList();
-        disponiveis.forEach(q -> System.out.println("ID: " + q.getNumero() + ", Capacidade: " + q.getCapacidadeMaxima()));
-
+    
         if (disponiveis.isEmpty()) {
-            System.out.println("Nenhum quarto disponível para a capacidade informada.");
+            System.out.println("Nenhum quarto disponível.");
             return;
         }
-
-        System.out.print("Escolha o ID do quarto: ");
-        int idQuartoEscolhido = scanner.nextInt();
-        Quarto quartoEscolhido = buscarQuarto(disponiveis, idQuartoEscolhido);
-
+    
+        System.out.println("Quartos disponíveis:");
+        disponiveis.forEach(q -> System.out.println("Quarto: " + q.getNumero()));
+    
+        System.out.print("Escolha o número do quarto: ");
+        int numeroQuarto = Integer.parseInt(scanner.nextLine());
+        Quarto quartoEscolhido = disponiveis.stream()
+                .filter(q -> q.getNumero() == numeroQuarto)
+                .findFirst()
+                .orElse(null);
+    
         if (quartoEscolhido != null) {
             quartoEscolhido.setOcupado(true);
-            Hospede hospede = new Hospede(reservas.size() + 1, nomeHospede);
-            Reserva novaReserva = new Reserva(reservas.size() + 1, dataEntrada, dataSaida, hospede);
+            Reserva novaReserva = new Reserva(reservas.size() + 1, dataEntrada, dataSaida, new Hospede(reservas.size() + 1, nomeHospede));
             novaReserva.adicionarQuarto(quartoEscolhido);
             reservas.add(novaReserva);
             System.out.println("Reserva criada com sucesso!");
         } else {
-            System.out.println("Quarto escolhido não encontrado ou indisponível.");
+            System.out.println("Quarto não encontrado.");
         }
     }
 
-    private static void confirmarReserva(Scanner scanner, List<Reserva> reservas) {
+    public static void confirmarReserva(Scanner scanner, List<Reserva> reservas) {
         System.out.print("ID da reserva a confirmar: ");
         int idReserva = scanner.nextInt();
         Reserva reserva = buscarReserva(reservas, idReserva);
@@ -228,7 +231,7 @@ public class Main {
         }
     }
 
-    private static void registrarManutencaoFuncionario(Scanner scanner, List<Quarto> quartos, List<Manutencao> manutencoes) {
+    public static void registrarManutencaoFuncionario(Scanner scanner, List<Quarto> quartos, List<Manutencao> manutencoes) {
         System.out.print("Número do quarto para manutenção: ");
         int numero = scanner.nextInt();
         Quarto quarto = buscarQuarto(quartos, numero);
@@ -245,7 +248,7 @@ public class Main {
         }
     }
 
-    private static void marcarManutencaoRealizada(Scanner scanner, List<Manutencao> manutencoes) {
+    public static void marcarManutencaoRealizada(Scanner scanner, List<Manutencao> manutencoes) {
         System.out.print("ID da manutenção realizada: ");
         int idManutencao = scanner.nextInt();
         Manutencao manutencao = buscarManutencao(manutencoes, idManutencao);
@@ -257,19 +260,19 @@ public class Main {
         }
     }
 
-    private static Quarto buscarQuarto(List<Quarto> quartos, int numero) {
+    public static Quarto buscarQuarto(List<Quarto> quartos, int numero) {
         return quartos.stream().filter(q -> q.getNumero() == numero).findFirst().orElse(null);
     }
 
-    private static Reserva buscarReserva(List<Reserva> reservas, int id) {
+    public static Reserva buscarReserva(List<Reserva> reservas, int id) {
         return reservas.stream().filter(r -> r.getId() == id).findFirst().orElse(null);
     }
 
-    private static Manutencao buscarManutencao(List<Manutencao> manutencoes, int id) {
+    public static Manutencao buscarManutencao(List<Manutencao> manutencoes, int id) {
         return manutencoes.stream().filter(m -> m.getId() == id).findFirst().orElse(null);
     }
 
-    private static int gerarIdManutencao() {
+    public static int gerarIdManutencao() {
         return (int) (Math.random() * 1000); // Gera um ID aleatório
     }
 }
